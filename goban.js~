@@ -35,9 +35,9 @@ var Goban = $.inherit(
 
 		draw_grid: function( goban_size ) {
 			this.goban_size = goban_size;
+			this.scale( 20 / (goban_size + 1) );
 			var layer = this.layer( 'grid' );
 			layer.clean( );
-			layer.scale( 20 / (goban_size + 1) );
 			var ctx = layer.get_context( );
 
 
