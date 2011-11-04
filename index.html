@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Goban Canvas</title>    
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script src="jquery.inherit-1.3.2.js"></script>
+    	<script src="./canvas.js"></script>
+    	<script src="./goban.js"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="./goban.css" />
+	<script>
+		var goban_size = 9;
+		var stones= {
+			white: [
+				{x: 2,y: 3},
+				{x: 5,y: 5}
+			],
+			black: [
+				{x: 1,y: 4},
+				{x: 2,y: 6}
+			]
+		};
+		$(function(){
+			var goban = new Goban( $('#goban') );
+			goban.draw_grid( goban_size );
+
+			$('#settings').submit( function( event ){
+				event.preventDefault();
+				goban_size = parseInt( $('[name="goban_size"]').val() );
+				goban.draw_grid( goban_size );
+				// goban_draw_stones( $('#goban')[0], goban_size, stones );
+			});
+
+		});
+	</script>
+	<style>
+		html, body, form {
+			margin: 0;
+			padding: 0;
+		}
+		.container {
+			max-width: 480px;
+			margin: 0 auto;
+		}
+		form {
+			margin: 20px 0 40px;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<form id="settings">
+			<input type="text" name="goban_size" value="19" />
+			<button>Regénérer</button>
+		</form>
+		<div id="goban" class="goban"></div>
+	</div>
+</body>
+</html>
