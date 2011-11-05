@@ -1,9 +1,13 @@
 // CANVAS
-var Canvas = $.inherit(
-    {
+var Canvas = $.inherit({
+
+	/***
+	   CONSTRUCTOR
+        ***/
         __constructor: function( element, width, height ) {
                 this.element     = element;
 		this.layers      = [];
+		this.attributes  = {};
                 this.width       = width;
                 this.height      = height;
                 size_ratio       = height / width;
@@ -14,8 +18,13 @@ var Canvas = $.inherit(
 		});
         },
 
+
+	/***
+	   PUBLIC METHODS
+        ***/
 	add_layer: function( layer_name ) {
 		this.layers[ layer_name ] = new Layer( this );
+		return this.layers[ layer_name ];
 	},
 
         scale: function( ratio ) {
@@ -27,18 +36,41 @@ var Canvas = $.inherit(
         layer: function( layer_name ) {
 		return this.layers[ layer_name ];
         },
-    }
-);
+
+	set: function( attributes ) {
+		for ( attribute_name in attributes ) {
+			if ( typeof this.attributes[ attribute_name ] == "undefined" ) {
+				delete attributes[ attribute_name ];
+			} else {
+				this.attributes[ attribute_name ] = attributes[ attribute_name ];
+			}
+		}
+		for ( layer_name in this.layers ) {
+			var layer = this.layers[ layer_name ];
+			for ( attribute_name in layer.dependencies ) {
+				var dependency = layer.dependencies[ attribute_name ];
+				if ( typeof attributes[ dependency ] != "undefined" ) {
+					layer.update();
+					break;
+				}
+			}
+		}
+	},
+
+	get: function( attribute_name ) {
+		return this.attributes[ attribute_name ];
+	}
+});
 
 
 // LAYER
-var Layer = $.inherit(
-    {
+var Layer = $.inherit({
 
 	/***
 	   CONSTRUCTOR
         ***/
         __constructor: function( canvas ) {
+		this.dependencies = [];
 		this.canvas  = canvas;
                 this.scale_ratio = 1;
                 this.element = $('<canvas>Your browser does not support the canvas element.</canvas>')
@@ -72,11 +104,18 @@ var Layer = $.inherit(
 		this.scale_ratio = ratio;
         },
 
+	update: function() {
+		this.clean( );
+		var ctx = this.get_context();
+		this.draw( ctx );
+	},
+
 
 	/***
 	   PRIVATE METHODS
         ***/
 	x_max: function( ) {
+		console.log(this.scale_ratio);
 		return this.canvas.width / this.scale_ratio;
 	},
 	y_max: function( ) {
@@ -87,7 +126,6 @@ var Layer = $.inherit(
 	/***
 	   METHODS TO OVERRIDE
         ***/
-	draw: function( ) {
+	draw: function( ctx ) {
 	}
-    }
-);
+});

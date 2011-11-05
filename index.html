@@ -10,7 +10,7 @@
     	<script src="./goban.js"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="./goban.css" />
 	<script>
-		var goban_size = 9;
+		var goban;
 		var stones= {
 			white: [
 				{x: 2,y: 3},
@@ -22,14 +22,18 @@
 			]
 		};
 		$(function(){
-			var goban = new Goban( $('#goban') );
-			goban.draw_grid( goban_size );
+			goban = new Goban( $('#goban') );
+			goban.set( {
+				goban_size: 9
+			});
 
 			$('#settings').submit( function( event ){
 				event.preventDefault();
 				goban_size = parseInt( $('[name="goban_size"]').val() );
-				goban.draw_grid( goban_size );
-				// goban_draw_stones( $('#goban')[0], goban_size, stones );
+				goban.set( {
+					goban_size: goban_size,
+					stones: stones
+				});
 			});
 
 		});
