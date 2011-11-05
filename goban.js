@@ -8,7 +8,7 @@ var Goban = $.inherit( Canvas, {
 		this.__base( element, 480, 480 );
 		this.attributes = {
 			goban_size: 19,
-			stones: {}
+			stones: { white: [], black: [] }
 		}
 		this.cell_size = 24;
 	
@@ -72,7 +72,7 @@ var Goban = $.inherit( Canvas, {
 			this.scale( 20 / (goban_size + 1) );
 			for ( color in stones ) {
 				ctx.fillStyle = color;
-				for ( var i = 0; i < stones[color].length; i++ ) {
+				for ( i in stones[color] ) {
 					ctx.beginPath();
 					ctx.arc( 
 						stones[color][i].x * cell_size, 
@@ -88,22 +88,37 @@ var Goban = $.inherit( Canvas, {
 			}
 		};
 		layer.onclick = function( x, y ) {
+			// STONE COORDS
 			var cell_size  = this.canvas.cell_size;
 			x = Math.round( x / cell_size );
 			y = Math.round( y / cell_size );
+			var coords = {x:x,y:y};
+
+			// CHANGE STONES
 			var stones = this.canvas.get('stones');
-			stones.black[ stones.black.length ] = {x:x,y:y}; 
+			var is_black = false;
+			for ( var i in stones.black ) {
+				if ( stones.black[ i ].x == x && stones.black[ i ].y == y ) {
+					is_black = true;
+					delete stones.black[ i ];
+					stones.white[ stones.white.length ] = coords;
+					break;
+				}
+			}
+			if ( ! is_black ) {			
+				var is_white = false;
+				for ( var i in stones.white ) {
+					if ( stones.white[ i ].x == x && stones.white[ i ].y == y ) {
+						is_white = true;
+						delete stones.white[ i ];
+						break;
+					}
+				}
+				if ( ! is_white ) {
+					stones.black[ stones.black.length ] = coords;
+				}
+			}
 			this.canvas.set( {stones: stones} );
 		};
 	},
-
-
-	/***
-	   PUBLIC METHODS
-        ***/
-
-
-	/***
-	   PRIVATE METHODS
-        ***/
 });
