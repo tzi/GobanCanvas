@@ -28,9 +28,10 @@ var Canvas = $.inherit({
 	/***
 	   PUBLIC METHODS
         ***/
-	add_layer: function( layer_name ) {
-		this.layers[ layer_name ] = new Layer( this );
-		return this.layers[ layer_name ];
+	add_layer: function( layer_name, layer) {
+		if ( typeof layer == "undefined") layer = new Layer( this );
+		this.layers[ layer_name ] = layer;
+		return layer;
 	},
 
         scale: function( ratio ) {
