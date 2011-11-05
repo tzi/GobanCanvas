@@ -16,6 +16,16 @@ var Goban = $.inherit( Canvas, {
 		            this.add_layer( 'stones', new Goban_Stones( this ) );
 		layer.update();
 	},
+
+
+	/***
+	   PUBLIC METHODS
+        ***/
+	add_stone: function( color, x, y ) {
+		var stones = this.get('stones');
+		stones[color][ stones[color].length ] = {x:x,y:y};
+		this.set( {stones: stones} );
+	}
 });
 
 
@@ -138,6 +148,7 @@ var Goban_Stones = $.inherit( Layer, {
 				is_black = true;
 				delete stones.black[ i ];
 				stones.white[ stones.white.length ] = coords;
+				this.canvas.set( {stones: stones} );
 				break;
 			}
 		}
@@ -147,13 +158,13 @@ var Goban_Stones = $.inherit( Layer, {
 				if ( stones.white[ i ].x == x && stones.white[ i ].y == y ) {
 					is_white = true;
 					delete stones.white[ i ];
+					this.canvas.set( {stones: stones} );
 					break;
 				}
 			}
 			if ( ! is_white ) {
-				stones.black[ stones.black.length ] = coords;
+				this.canvas.add_stone( 'black', x, y );
 			}
 		}
-		this.canvas.set( {stones: stones} );
 	},
 });
