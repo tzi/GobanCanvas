@@ -87,11 +87,23 @@ var Goban = $.inherit( Canvas, {
 				}
 			}
 		};
-
-	
-		// EVENT
-		$( element ).click(function(event){
-			console.dir(event);
-		});
+		layer.onclick = function( x, y ) {
+			var cell_size  = this.canvas.cell_size;
+			x = Math.round( x / cell_size );
+			y = Math.round( y / cell_size );
+			var stones = this.canvas.get('stones');
+			stones.black[ stones.black.length ] = {x:x,y:y}; 
+			this.canvas.set( {stones: stones} );
+		};
 	},
+
+
+	/***
+	   PUBLIC METHODS
+        ***/
+
+
+	/***
+	   PRIVATE METHODS
+        ***/
 });

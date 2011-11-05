@@ -13,8 +13,14 @@ var Canvas = $.inherit({
                 size_ratio       = height / width;
 		element.css({width: '100%'})
 			.css({height: $( element ).width() * size_ratio});
+		
+		// EVENT
 		$(window).resize(function(){
 			$( element ).css({height: $( element ).width() * size_ratio});
+		});
+		canvas = this;
+		$( element ).click( function(event){
+			canvas.click_handler(event);
 		});
         },
 
@@ -59,7 +65,21 @@ var Canvas = $.inherit({
 
 	get: function( attribute_name ) {
 		return this.attributes[ attribute_name ];
-	}
+	},
+
+
+	/***
+	   PRIVATE METHODS
+        ***/
+	click_handler: function( event ) {
+		for ( layer_name in this.layers ) {
+			var layer = this.layers[ layer_name ];
+			layer.onclick( 
+				event.layerX * this.width  / $(this.element).width() / layer.scale_ratio,
+				event.layerY * this.height / $(this.element).height() / layer.scale_ratio
+			);
+		}
+	},
 });
 
 
@@ -115,7 +135,6 @@ var Layer = $.inherit({
 	   PRIVATE METHODS
         ***/
 	x_max: function( ) {
-		console.log(this.scale_ratio);
 		return this.canvas.width / this.scale_ratio;
 	},
 	y_max: function( ) {
@@ -127,5 +146,7 @@ var Layer = $.inherit({
 	   METHODS TO OVERRIDE
         ***/
 	draw: function( ctx ) {
+	},
+	onclick: function( x, y ) {
 	}
 });
