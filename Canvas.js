@@ -6,8 +6,10 @@ var Canvas = $.inherit({
         ***/
         __constructor: function( element, width, height ) {
                 this.element     = element;
+                this.scale_ratio = 1;
 		this.layers      = [];
 		this.attributes  = {};
+                this.dependencies = [];
                 this.width       = width;
                 this.height      = height;
                 size_ratio       = height / width;
@@ -34,9 +36,10 @@ var Canvas = $.inherit({
 		return layer;
 	},
 
-        scale: function( ratio ) {
+        scale: function( absolute_scale ) {
+		this.scale_ratio = absolute_scale;
 		for ( layer_name in this.layers ) {
-			this.layers[ layer_name ].scale( ratio );
+			this.layers[ layer_name ].scale( );
 		};
         },
 
@@ -51,6 +54,13 @@ var Canvas = $.inherit({
 			} else {
 				this.attributes[ attribute_name ] = attributes[ attribute_name ];
 			}
+		}
+		for ( attribute_name in this.dependencies ) {
+			var dependency = this.dependencies[ attribute_name ];
+			if ( typeof attributes[ dependency ] != "undefined" ) {
+                                this.update();
+                                break;
+                        }
 		}
 		for ( layer_name in this.layers ) {
 			var layer = this.layers[ layer_name ];
@@ -81,6 +91,14 @@ var Canvas = $.inherit({
 			);
 		}
 	},
+
+
+        /***
+           METHODS TO OVERRIDE
+        ***/
+        update: function( ) {
+        },
+
 });
 
 
@@ -93,7 +111,8 @@ var Layer = $.inherit({
         __constructor: function( canvas ) {
 		this.dependencies = [];
 		this.canvas  = canvas;
-                this.scale_ratio = 1;
+                this.layer_scale = 1;
+		this.total_scale = 1;
                 this.element = $('<canvas>Your browser does not support the canvas element.</canvas>')
 			.appendTo( canvas.element )
 			.attr( 'width',  canvas.width  )
@@ -118,11 +137,18 @@ var Layer = $.inherit({
 		ctx.clearRect( 0, 0, this.x_max(), this.y_max() );
         },
 
-        scale : function( ratio ) {
-		var scale_ratio = ratio / this.scale_ratio;
-		var ctx = this.get_context();
-		ctx.scale( scale_ratio, scale_ratio );
-		this.scale_ratio = ratio;
+        scale : function( absolute_scale ) {
+		if ( typeof absolute_scale != "undefined" ) {
+			this.layer_scale = absolute_scale;
+		}
+		var new_total_scale = this.canvas.scale_ratio * this.layer_scale;
+		if ( new_total_scale != this.total_scale ) {
+			var relative_scale = new_total_scale / this.total_scale;
+			var ctx = this.get_context();
+			ctx.scale( relative_scale, relative_scale );
+			this.total_scale = new_total_scale;
+			this.update();
+		}
         },
 
 	update: function() {
@@ -144,10 +170,10 @@ var Layer = $.inherit({
 	   PRIVATE METHODS
         ***/
 	x_max: function( ) {
-		return this.canvas.width / this.scale_ratio;
+		return this.canvas.width / this.total_scale;
 	},
 	y_max: function( ) {
-		return this.canvas.height / this.scale_ratio;
+		return this.canvas.height / this.total_scale;
 	},
 
 
