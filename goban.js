@@ -71,7 +71,7 @@ var Goban_Grid = $.inherit( Layer, {
 	   OVERRITE METHODS
         ***/
 	draw: function( ctx ) {
-		var goban_size = this.canvas.get('goban_size');
+		var goban_size = this.get('goban_size');
 		var cell_size = this.canvas.cell_size;
 		this.scale( 20 / (goban_size + 1) );
 		ctx.strokeStyle      = 'black';
@@ -111,8 +111,8 @@ var Goban_Stones = $.inherit( Layer, {
 	   OVERRITE METHODS
         ***/
 	draw: function( ctx ) {
-		var goban_size = this.canvas.get('goban_size');
-		var stones     = this.canvas.get('stones');
+		var goban_size = this.get('goban_size');
+		var stones     = this.get('stones');
 		var cell_size  = this.canvas.cell_size;
 		this.scale( 20 / (goban_size + 1) );
 		for ( color in stones ) {
@@ -141,14 +141,14 @@ var Goban_Stones = $.inherit( Layer, {
 		var coords = {x:x,y:y};
 
 		// CHANGE STONES
-		var stones = this.canvas.get('stones');
+		var stones = this.get('stones');
 		var is_black = false;
 		for ( var i in stones.black ) {
 			if ( stones.black[ i ].x == x && stones.black[ i ].y == y ) {
 				is_black = true;
 				delete stones.black[ i ];
 				stones.white[ stones.white.length ] = coords;
-				this.canvas.set( {stones: stones} );
+				this.set( {stones: stones} );
 				break;
 			}
 		}
@@ -158,7 +158,7 @@ var Goban_Stones = $.inherit( Layer, {
 				if ( stones.white[ i ].x == x && stones.white[ i ].y == y ) {
 					is_white = true;
 					delete stones.white[ i ];
-					this.canvas.set( {stones: stones} );
+					this.set( {stones: stones} );
 					break;
 				}
 			}
