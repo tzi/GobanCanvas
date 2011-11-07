@@ -58,8 +58,7 @@ var Canvas = $.inherit({
 		for ( attribute_name in this.dependencies ) {
 			var dependency = this.dependencies[ attribute_name ];
 			if ( typeof attributes[ dependency ] != "undefined" ) {
-                                this.update();
-                                break;
+                                this.update( dependency );
                         }
 		}
 		for ( layer_name in this.layers ) {
@@ -67,8 +66,7 @@ var Canvas = $.inherit({
 			for ( attribute_name in layer.dependencies ) {
 				var dependency = layer.dependencies[ attribute_name ];
 				if ( typeof attributes[ dependency ] != "undefined" ) {
-					layer.update();
-					break;
+					layer.update( dependency );
 				}
 			}
 		}
@@ -83,13 +81,10 @@ var Canvas = $.inherit({
 	   PRIVATE METHODS
         ***/
 	click_handler: function( event ) {
-		for ( layer_name in this.layers ) {
-			var layer = this.layers[ layer_name ];
-			layer.onclick( 
-				event.layerX * this.width  / $(this.element).width() / layer.scale_ratio,
-				event.layerY * this.height / $(this.element).height() / layer.scale_ratio
-			);
-		}
+		this.onclick( 
+			event.layerX * this.width  / $(this.element).width()  / this.scale_ratio,
+			event.layerY * this.height / $(this.element).height() / this.scale_ratio
+		);
 	},
 
 
@@ -98,6 +93,9 @@ var Canvas = $.inherit({
         ***/
         update: function( ) {
         },
+        onclick: function( x, y ) {
+        },
+
 
 });
 
@@ -182,6 +180,4 @@ var Layer = $.inherit({
         ***/
 	draw: function( ctx ) {
 	},
-	onclick: function( x, y ) {
-	}
 });

@@ -5,13 +5,17 @@ var Goban = $.inherit( Canvas, {
 	   CONSTRUCTOR
         ***/
 	__constructor: function( element ) {
+		this.colors = [ 'black', 'white' ];
 		this.__base( element, 480, 480 );
 		this.attributes = {
 			goban_size: 19,
-			stones: { white: [], black: [] },
+			stones: [],
+			initial_stones: [ [], [] ],
+			initial_color: 0,
+			turns: [],
 			cell_size: 24
 		}
-		this.dependencies = [ 'goban_size' ];
+		this.dependencies = [ 'goban_size', 'initial_stones' ];
 		var layer = this.add_layer( 'bg', new Goban_Background( this ) );
 			    this.add_layer( 'grid', new Goban_Grid( this ) );
 		            this.add_layer( 'stones', new Goban_Stones( this ) );
@@ -22,20 +26,64 @@ var Goban = $.inherit( Canvas, {
 	/***
 	   PUBLIC METHODS
         ***/
-	add_stone: function( color, x, y ) {
-		var stones = this.get('stones');
-		stones[color][ stones[color].length ] = {x:x,y:y};
-		this.set( {stones: stones} );
+	play: function ( x, y ) {
+		var turn = { x:x, y:y }
+                var turns = this.get( 'turns' );
+		var stones = this.get( 'stones' );
+		if ( typeof turns[ turns.length - 1 ] == "undefined") {
+			turn.color = this.get('initial_color');
+		} else { 
+			turn.color = ( turns[ turns.length - 1 ].color + 1 ) % 2;
+		}
+		turns[ turns.length ] = turn;
+		stones = this.add_stone( stones, x, y, turn.color );
+		this.set({
+			turns: turns,
+			stones: stones,
+		});	
+	},
+
+
+        /***
+           PRIVATE METHODS
+        ***/
+	add_stone: function( stones, x, y, color ) {
+		if ( typeof stones[ x ] == "undefined" ) {	
+			stones[ x ] = [];
+		} 
+		stones[ x ][ y ] = color;
+		return stones;
 	},
     
 
 	/***
            OVERRITE METHODS
         ***/
-        update: function( ) {
-		var goban_size = this.get('goban_size');
-                this.scale( 20 / (goban_size + 1) );
-	}
+        update: function( attribute ) {
+		if ( attribute == 'goban_size' ) {
+			var goban_size = this.get('goban_size');
+	                this.scale( 20 / (goban_size + 1) );
+		} else if ( attribute == 'initial_stones' ) {
+			var initial_stones = this.get( 'initial_stones' );
+			var stones = [];
+			for ( var i in this.colors ) {
+				for ( var stone in initial_stones[ i ] ) {
+					stones = this.add_stone( stones, stone.x, stone.y, i );
+				}
+			}
+			this.set({
+				stones: stones,
+			});
+		}
+	},
+
+	onclick: function( x, y ) {
+                // STONE COORDS
+                var cell_size  = this.get('cell_size');
+                x = Math.round( x / cell_size );
+                y = Math.round( y / cell_size );
+		this.play( x, y );
+	},
 });
 
 
@@ -114,13 +162,13 @@ var Goban_Stones = $.inherit( Layer, {
 		var goban_size = this.get('goban_size');
 		var stones     = this.get('stones');
 		var cell_size  = this.get('cell_size');
-		for ( color in stones ) {
-			ctx.fillStyle = color;
-			for ( i in stones[color] ) {
+		for ( var x in stones ) {
+			for ( var y in stones[ x ] ) {
+				ctx.fillStyle = this.canvas.colors[ stones[ x ][ y ] ];
 				ctx.beginPath();
 				ctx.arc( 
-					stones[color][i].x * cell_size, 
-					stones[color][i].y * cell_size, 
+					x * cell_size, 
+					y * cell_size, 
 					10, 
 					0, 
 					Math.PI*2, 
@@ -132,38 +180,4 @@ var Goban_Stones = $.inherit( Layer, {
 		}
 	},
 
-	onclick: function( x, y ) {
-		// STONE COORDS
-		var cell_size  = this.canvas.cell_size;
-		x = Math.round( x / cell_size );
-		y = Math.round( y / cell_size );
-		var coords = {x:x,y:y};
-
-		// CHANGE STONES
-		var stones = this.get('stones');
-		var is_black = false;
-		for ( var i in stones.black ) {
-			if ( stones.black[ i ].x == x && stones.black[ i ].y == y ) {
-				is_black = true;
-				delete stones.black[ i ];
-				stones.white[ stones.white.length ] = coords;
-				this.set( {stones: stones} );
-				break;
-			}
-		}
-		if ( ! is_black ) {			
-			var is_white = false;
-			for ( var i in stones.white ) {
-				if ( stones.white[ i ].x == x && stones.white[ i ].y == y ) {
-					is_white = true;
-					delete stones.white[ i ];
-					this.set( {stones: stones} );
-					break;
-				}
-			}
-			if ( ! is_white ) {
-				this.canvas.add_stone( 'black', x, y );
-			}
-		}
-	},
 });
