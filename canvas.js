@@ -131,6 +131,14 @@ var Layer = $.inherit({
 		this.draw( ctx );
 	},
 
+	set: function( attributes ) {
+		this.canvas.set( attributes );
+	},
+
+	get: function( attribute_name ) {
+		return this.canvas.get( attribute_name );
+	},
+
 
 	/***
 	   PRIVATE METHODS
