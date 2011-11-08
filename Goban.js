@@ -56,7 +56,16 @@ var Goban = $.inherit( Canvas, {
 		}
 		return stones;
 	},
-	get_stone: function ( stones, coord ) {
+	remove_stone: function( stones, coord ) {
+		if ( 	this.is_coord_on_goban( coord ) &&
+                        typeof stones[ coord.x ] != "undefined" &&
+			typeof stones[ coord.x ][ coord.y ] != "undefined"
+		) {
+			delete stones[ coord.x ][ coord.y ];
+                }
+                return stones;
+	},
+	get_stone: function( stones, coord ) {
 		if ( typeof stones[ coord.x ] == "undefined" ||	
 			typeof stones[ coord.x ][ coord.y ] == "undefined"
 		) {
@@ -68,10 +77,8 @@ var Goban = $.inherit( Canvas, {
 		stones = this.add_stone( stones, turn );
 		var coord_around = this.coord_around( turn );
 		for ( var i in coord_around ) {
-			if ( this.get_stone( stones, coord_around[ i ] ) == ( turn.color + 1 ) % 2 &&
-			     this.stone_liberties( stones, coord_around[ i ] ) == 0 
-			) {
-				stones = this.remove_stone_group( stones, turn );
+			if ( this.get_stone( stones, coord_around[ i ] ) == ( turn.color + 1 ) % 2 ) {
+				stones = this.check_group( stones, coord_around[ i ] );
 			}
                 }
                 //if ( this.stone_liberties( stones, turn ) == 0 ) {
@@ -79,8 +86,15 @@ var Goban = $.inherit( Canvas, {
                 //}
 		return stones;
 	},
-	stone_liberties: function( stones, coord ) {
-		var group = this.get_stone_group( stones, coord );
+	check_group: function( stones, coord ) {
+		var group = this.group( stones, coord );	
+	        var liberties = this.group_liberties( group );	
+		if ( liberties.length == 0 ) {
+			stones = this.remove_group( stones, group );
+		}
+		return stones;
+	},
+	group_liberties: function( group ) {
 		var liberties = [];
 		for ( var j in group ) {
 			var coord_around = this.coord_around( group[ j ] );
@@ -102,21 +116,18 @@ var Goban = $.inherit( Canvas, {
         	        }
 			
 		}
-		console.dir(liberties);
-		return liberties.length;
-	},
-	add_liberties_recursive: function( stones, coord, coord_from, liberties ) {
-		
 		return liberties;
 	},
-	remove_stone_group: function( stones, coord ) {
-		alert( 'dead: ' +coord.x+','+coord.y );
+	remove_group: function( stones, coord ) {
+		for ( var j in group ) {
+			stones = his.remove_stone( stones, group[ j ] );
+		}
 		return stones;
         },
-	get_stone_group: function( stones, coord, coord_from, group ) {
+	group: function( stones, coord, coord_from, group ) {
 		return this.get_stone_group_recursive( stones, coord, { x: -2, y: -2 }, [] );
         },
-	get_stone_group_recursive: function( stones, coord, coord_from, group ) {
+	group_recursive: function( stones, coord, coord_from, group ) {
 		var found = false;
 		for ( var i in group ) {
 			if ( group[ i ].x == coord.x && group[ i ].y == coord.y ) {
@@ -131,7 +142,7 @@ var Goban = $.inherit( Canvas, {
 	                        if (    ! ( coord_around[ i ].x == coord_from.x && coord_around[ i ].y == coord_from.y ) && 
 					this.get_stone( stones, coord_around[ i ] ) == this.get_stone( stones, coord ) 
 	                        ) {
-	                                group = this.get_stone_group_recursive( stones, coord_around[ i ], coord, group );
+	                                group = this.group_recursive( stones, coord_around[ i ], coord, group );
 	                        }
         	        }
 		}
