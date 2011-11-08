@@ -88,13 +88,13 @@ var Goban = $.inherit( Canvas, {
 	},
 	check_group: function( stones, coord ) {
 		var group = this.group( stones, coord );	
-	        var liberties = this.group_liberties( group );	
+	        var liberties = this.group_liberties( stones, group );	
 		if ( liberties.length == 0 ) {
 			stones = this.remove_group( stones, group );
 		}
 		return stones;
 	},
-	group_liberties: function( group ) {
+	group_liberties: function( stones, group ) {
 		var liberties = [];
 		for ( var j in group ) {
 			var coord_around = this.coord_around( group[ j ] );
@@ -118,14 +118,14 @@ var Goban = $.inherit( Canvas, {
 		}
 		return liberties;
 	},
-	remove_group: function( stones, coord ) {
+	remove_group: function( stones, group ) {
 		for ( var j in group ) {
-			stones = his.remove_stone( stones, group[ j ] );
+			stones = this.remove_stone( stones, group[ j ] );
 		}
 		return stones;
         },
 	group: function( stones, coord, coord_from, group ) {
-		return this.get_stone_group_recursive( stones, coord, { x: -2, y: -2 }, [] );
+		return this.group_recursive( stones, coord, { x: -2, y: -2 }, [] );
         },
 	group_recursive: function( stones, coord, coord_from, group ) {
 		var found = false;
