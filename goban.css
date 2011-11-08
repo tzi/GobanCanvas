@@ -1,5 +1,6 @@
 .goban {
 	position:	relative;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 }
 .goban canvas {
 	position:	absolute;
