@@ -81,20 +81,42 @@ var Goban = $.inherit( Canvas, {
 	},
 	stone_liberties: function( stones, coord ) {
 		var group = this.get_stone_group( stones, coord );
-		console.dir( group );
-		return 1;
+		var liberties = [];
+		for ( var j in group ) {
+			var coord_around = this.coord_around( group[ j ] );
+			for ( var i in coord_around ) {
+	                        if ( this.get_stone( stones, coord_around[ i ] ) == -1 ) {
+	                                var found = false;
+					for ( var k in liberties ) {
+						if ( 	liberties[ k ].x == coord_around[ i ].x && 
+							liberties[ k ].y == coord_around[ i ].y
+						) {
+							found = true;
+							break;
+						}
+					}
+					if ( found == false ) {
+						liberties[ liberties.length ] = coord_around[ i ];
+					}
+	                        }
+        	        }
+			
+		}
+		console.dir(liberties);
+		return liberties.length;
+	},
+	add_liberties_recursive: function( stones, coord, coord_from, liberties ) {
+		
+		return liberties;
 	},
 	remove_stone_group: function( stones, coord ) {
 		alert( 'dead: ' +coord.x+','+coord.y );
 		return stones;
         },
 	get_stone_group: function( stones, coord, coord_from, group ) {
-		if ( typeof coord_from == "undefined" ) {
-			coord_from = { x: -2, y: -2 };
-		}
-		if ( typeof group == "undefined" ) {
-			group = [ ];
-		}
+		return this.get_stone_group_recursive( stones, coord, { x: -2, y: -2 }, [] );
+        },
+	get_stone_group_recursive: function( stones, coord, coord_from, group ) {
 		var found = false;
 		for ( var i in group ) {
 			if ( group[ i ].x == coord.x && group[ i ].y == coord.y ) {
@@ -109,7 +131,7 @@ var Goban = $.inherit( Canvas, {
 	                        if (    ! ( coord_around[ i ].x == coord_from.x && coord_around[ i ].y == coord_from.y ) && 
 					this.get_stone( stones, coord_around[ i ] ) == this.get_stone( stones, coord ) 
 	                        ) {
-	                                group = this.get_stone_group( stones, coord_around[ i ], coord, group );
+	                                group = this.get_stone_group_recursive( stones, coord_around[ i ], coord, group );
 	                        }
         	        }
 		}
