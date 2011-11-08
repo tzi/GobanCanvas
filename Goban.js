@@ -90,7 +90,7 @@ var Goban = $.inherit( Canvas, {
 				stones = this.check_group( stones, coord_around[ i ] );
 			}
                 }
-		stones = this.check_group( stones, turn );
+		stones = this.check_stone( stones, turn );
                 if ( this.get_stone( stones, turn ) == -1 ) {
                        	return false; 
                 }
@@ -101,6 +101,14 @@ var Goban = $.inherit( Canvas, {
 	        var liberties = this.group_liberties( stones, group );	
 		if ( liberties.length == 0 ) {
 			stones = this.remove_group( stones, group );
+		}
+		return stones;
+	},
+	check_stone: function( stones, coord ) {
+		var group = this.group( stones, coord );
+                var liberties = this.group_liberties( stones, group );
+                if ( liberties.length == 0 ) {
+			stones = this.remove_stone( stones, coord );
 		}
 		return stones;
 	},
