@@ -13,13 +13,18 @@ var Canvas = $.inherit({
                 this.width       = width;
                 this.height      = height;
                 size_ratio       = height / width;
-		element.css({width: '100%'})
-			.css({height: $( element ).width() * size_ratio});
+		element.css({width: '100%'});
+		var width = Math.min(
+			$( element ).width(),
+			$( window ).width(),
+			$( window ).height() / size_ratio
+		);
+		element.css({
+			width: width,
+			height: width * size_ratio
+		});
 		
 		// EVENT
-		$(window).resize(function(){
-			$( element ).css({height: $( element ).width() * size_ratio});
-		});
 		canvas = this;
 		$( element ).click( function(event){
 			canvas.click_handler(event);
