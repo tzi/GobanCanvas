@@ -1,5 +1,5 @@
 // GOBAN
-var Goban = $.inherit( Canvas, {
+var GobanCanvas = $.inherit( Canvas, {
 
 	/***
 	   CONSTRUCTOR

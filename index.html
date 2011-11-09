@@ -6,8 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 	<script src="./jquery.min.js"></script>
 	<script src="./jquery.inherit-1.3.2.js"></script>
+    	<script src="./Canvas.js"></script>
     	<script src="./GobanCanvas.js"></script>
-    	<script src="./Goban.js"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="./goban.css" />
 	<script>
 		var goban;
@@ -22,7 +22,7 @@
 			]
 		};
 		$(function(){
-			goban = new Goban( $('#goban') );
+			goban = new GobanCanvas( $('#goban') );
 			goban.set( {
 				goban_size: 9
 			});
