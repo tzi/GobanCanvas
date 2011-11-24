@@ -20,6 +20,7 @@ var GoParty = $.inherit({
 		var goban = new Goban( this.size, this.stones );
 		var turn = coord;
 		turn.color = this.current_color();
+		console.log( turn.color );
 		goban.turn( coord );
 		this.error = goban.error;
 		if ( this.error == false ) {
@@ -38,7 +39,7 @@ var GoParty = $.inherit({
 		if ( this.gobans.length == 0 ) {
 			return 0;
 		}
-		return this.gobans[ this.gobans.length - 1 ].turn.color + 1 % 2;
+		return ( this.gobans[ this.gobans.length - 1 ].turn.color + 1 ) % 2;
 	},
 });
 
