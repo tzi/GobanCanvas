@@ -26,13 +26,13 @@ var GobanCanvas = $.inherit( Canvas, {
         ***/
 	play: function ( x, y ) {
 		var turn = { x:x, y:y }
-		var error = this.party.play( turn );
-		if ( error == false ) {
+		this.party.play( turn );
+		if ( this.party.error == false ) {
 			this.set({
 				stones: this.party.stones,
 			});	
 		} else {
-			alert( error );
+			alert( this.party.error );
 		}
 	},
 

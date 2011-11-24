@@ -9,7 +9,7 @@ var GoParty = $.inherit({
 		this.size = size;
 		this.error = false;
 		this.stones = stones;
-		this.turns = [];
+		this.gobans = [];
 	},
 
 
@@ -18,20 +18,28 @@ var GoParty = $.inherit({
         ***/
 	play: function( coord ) {
 		var goban = new Goban( this.size, this.stones );
+		var turn = coord;
+		turn.color = this.current_color();
 		goban.turn( coord );
 		this.error = goban.error;
 		if ( this.error == false ) {
 			this.stones = goban.stones;
-			this.turns[this.turns.length] = goban;
+			this.gobans[this.gobans.length] = goban;
 			return true;
 		} 
 		return false;
-	};
+	},
 
 
         /***
            PRIVATE METHODS
         ***/
+	current_color: function( ) {
+		if ( this.gobans.length == 0 ) {
+			return 0;
+		}
+		return this.gobans[ this.gobans.length - 1 ].turn.color + 1 % 2;
+	},
 });
 
 
@@ -60,12 +68,12 @@ var Goban = $.inherit({
                 }
                 var coord_around = this.coord_around( turn );
                 for ( var i in coord_around ) {
-                        if ( this.get_stone( coord_around[ i ] ) == ( turn.color + 1 ) % 2 ) {
+                        if ( this.stone( coord_around[ i ] ) == ( turn.color + 1 ) % 2 ) {
                                 this.check_group( coord_around[ i ] );
                         }
                 }
                 this.check_group( turn );
-                if ( this.get_stone( turn ) == -1 ) {
+                if ( this.stone( turn ) == -1 ) {
 			this.error = "Suicide";
                         return false;
                 }
@@ -119,7 +127,7 @@ var Goban = $.inherit({
 		for ( var j in group ) {
 			var coord_around = this.coord_around( group[ j ] );
 			for ( var i in coord_around ) {
-	                        if ( this.get_stone( coord_around[ i ] ) == -1 ) {
+	                        if ( this.stone( coord_around[ i ] ) == -1 ) {
 	                                var found = false;
 					for ( var k in liberties ) {
 						if ( 	liberties[ k ].x == coord_around[ i ].x && 
@@ -159,7 +167,7 @@ var Goban = $.inherit({
 			var coord_around = this.coord_around( coord );
 			for ( var i in coord_around ) {
 	                        if (    ! ( coord_around[ i ].x == coord_from.x && coord_around[ i ].y == coord_from.y ) && 
-					this.get_stone( coord_around[ i ] ) == this.get_stone( coord ) 
+					this.stone( coord_around[ i ] ) == this.stone( coord ) 
 	                        ) {
 	                                group = this.group_recursive( coord_around[ i ], coord, group );
 	                        }
