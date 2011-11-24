@@ -20,7 +20,6 @@ var GoParty = $.inherit({
 		var goban = new Goban( this.size, this.stones );
 		var turn = coord;
 		turn.color = this.current_color();
-		console.log( turn.color );
 		goban.turn( coord );
 		this.error = goban.error;
 		if ( this.error == false ) {
@@ -120,7 +119,7 @@ var Goban = $.inherit({
 		var group = this.group( coord );	
 	        var liberties = this.group_liberties( group );	
 		if ( liberties.length == 0 ) {
-			this.stones = this.remove_group(  group );
+			this.remove_group(  group );
 		}
 	},
 	group_liberties: function( group ) {
