@@ -35,6 +35,22 @@ var GobanCanvas = $.inherit( Canvas, {
 			alert( this.party.error );
 		}
 	},
+        begin: function( ) {
+		this.party.begin( );
+                this.set( { stones: this.party.stones } );
+        },
+        previous: function( ) {
+		this.party.previous( );
+                this.set( { stones: this.party.stones } );
+        },
+        next: function( ) {
+                this.party.next( );
+                this.set( { stones: this.party.stones } );
+        },
+        end: function( ) {
+		this.party.end( );
+		this.set( { stones: this.party.stones } );
+        },
 
 
 	/***

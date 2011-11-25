@@ -5,11 +5,11 @@ var GoParty = $.inherit({
 	   CONSTRUCTOR
         ***/
 	__constructor: function( size, stones ) {
-		this.initial_goban = new Goban( size, stones );
 		this.size = size;
 		this.error = false;
 		this.stones = stones;
-		this.gobans = [];
+		this.gobans = [ new Goban( size, stones ) ];
+		this.turn_index = 0;
 	},
 
 
@@ -17,17 +17,40 @@ var GoParty = $.inherit({
 	   PUBLIC METHODS
         ***/
 	play: function( coord ) {
-		var goban = new Goban( this.size, this.stones );
+		// Clone of stones array
+		var goban = new Goban( this.size, $.extend( true, [], this.stones ) );
 		var turn = coord;
 		turn.color = this.current_color();
-		goban.turn( coord );
+		goban.play( turn );
 		this.error = goban.error;
 		if ( this.error == false ) {
 			this.stones = goban.stones;
-			this.gobans[this.gobans.length] = goban;
+			this.turn_index++;
+			this.gobans = this.gobans.slice( 0, this.turn_index );
+			this.gobans[ this.turn_index ] = goban;
 			return true;
 		} 
 		return false;
+	},
+	previous: function( ) {
+		if ( this.turn_index <= 0 ) {
+			return false;
+		}
+		this.update_turn_index( this.turn_index - 1 );
+		return true;
+	},
+	next: function( ) {
+		if ( this.turn_index >= this.gobans.length - 1 ) {
+                        return false;
+                }
+		this.update_turn_index( this.turn_index + 1 );
+                return true;
+	},
+	begin: function( ) {
+		this.update_turn_index( 0 );
+	},
+	end: function( ) {
+		this.update_turn_index( this.gobans.length - 1 );
 	},
 
 
@@ -38,7 +61,11 @@ var GoParty = $.inherit({
 		if ( this.gobans.length == 0 ) {
 			return 0;
 		}
-		return ( this.gobans[ this.gobans.length - 1 ].turn.color + 1 ) % 2;
+		return ( this.gobans[ this.turn_index ].turn.color + 1 ) % 2;
+	},
+	update_turn_index: function( turn_index ) {
+		this.turn_index = turn_index;
+		this.stones = this.gobans[ this.turn_index ].stones;
 	},
 });
 
@@ -51,7 +78,7 @@ var Goban = $.inherit({
         ***/
         __constructor: function( size, stones ) {
                 this.stones = stones;
-         	this.turn;
+         	this.turn = { color: 1 };
 		this.size = size;
 		this.error = false;
         },
@@ -60,7 +87,7 @@ var Goban = $.inherit({
         /***
            PUBLIC METHODS
         ***/
-	turn: function( turn ) {
+	play: function( turn ) {
 		this.turn = turn;
 		this.add_stone( turn );
                 if ( this.error !== false ) {
