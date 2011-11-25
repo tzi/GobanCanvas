@@ -22,7 +22,12 @@ var GoParty = $.inherit({
 		var turn = coord;
 		turn.color = this.current_color();
 		goban.play( turn );
-		this.error = goban.error;
+		// Detect KO
+		if ( this.turn_index > 2 && goban.KOable && this.gobans[ this.turn_index - 1 ].stone( turn ) == turn.color ) {
+			this.error = "KO";
+		} else {
+			this.error = goban.error;
+		}
 		if ( this.error == false ) {
 			this.stones = goban.stones;
 			this.turn_index++;
@@ -81,6 +86,7 @@ var Goban = $.inherit({
          	this.turn = { color: 1 };
 		this.size = size;
 		this.error = false;
+		this.KOable = false;
         },
 
 
@@ -93,6 +99,9 @@ var Goban = $.inherit({
                 if ( this.error !== false ) {
                         return false;
                 }
+		if ( this.check_group( turn, false ) == false ) {
+			this.KOable = true;
+		}
                 var coord_around = this.coord_around( turn );
                 for ( var i in coord_around ) {
                         if ( this.stone( coord_around[ i ] ) == ( turn.color + 1 ) % 2 ) {
@@ -142,12 +151,19 @@ var Goban = $.inherit({
                 }
 		return this.stones[ coord.x ][ coord.y ];
 	},
-	check_group: function( coord ) {
+	check_group: function( coord, remove_stone ) {
+		if ( typeof remove_stone == "undefined" ) {
+			remove_stone = true;
+		}
 		var group = this.group( coord );	
 	        var liberties = this.group_liberties( group );	
 		if ( liberties.length == 0 ) {
-			this.remove_group(  group );
+			if ( remove_stone ) {
+				this.remove_group(  group );
+			}
+			return false;
 		}
+		return true;
 	},
 	group_liberties: function( group ) {
 		var liberties = [];
