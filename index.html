@@ -37,6 +37,10 @@
 			});
 
 		});
+		var onplay = function() {
+			$('#black_prisoner').html( goban.party.goban.prisoner[ 0 ] );
+			$('#white_prisoner').html( goban.party.goban.prisoner[ 1 ] );
+		}
 	</script>
 	<style>
 		html, body, form {
@@ -64,6 +68,10 @@
 			<a href="javascript:goban.previous();"><</a>
 			<a href="javascript:goban.next();">></a>
 			<a href="javascript:goban.end();">>>|</a>
+		</div>
+		<div class="prisoner">
+			<p>Black : <span id="black_prisoner">0</span> prisoners.</p>
+			<p>White : <span id="white_prisoner">0</span> prisoners.</p>
 		</div>
 	</div>
 </body>

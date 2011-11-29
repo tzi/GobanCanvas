@@ -10,6 +10,7 @@ var GoParty = $.inherit({
 		this.stones = stones;
 		this.gobans = [ new Goban( size, stones ) ];
 		this.turn_index = 0;
+		this.prisoner = [ 0, 0 ];
 	},
 
 
@@ -20,7 +21,9 @@ var GoParty = $.inherit({
 		// Clone of stones array
 		var goban = new Goban( this.size, $.extend( true, [], this.stones ) );
 		var turn = coord;
-		turn.color = this.current_color();
+		if ( typeof turn.color == "undefined" ) {
+			turn.color = this.current_color();
+		}
 		goban.play( turn );
 		// Detect KO
 		if ( this.turn_index > 2 && goban.KOable && this.gobans[ this.turn_index - 1 ].stone( turn ) == turn.color ) {
@@ -193,6 +196,7 @@ var Goban = $.inherit({
 		for ( var j in group ) {
 			this.remove_stone( group[ j ] );
 		}
+		this.prisoner[ this.turn.color ] += group.length;
         },
 	group: function( coord, coord_from, group ) {
 		return this.group_recursive( coord, { x: -2, y: -2 }, [] );

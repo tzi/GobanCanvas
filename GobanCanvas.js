@@ -31,6 +31,9 @@ var GobanCanvas = $.inherit( Canvas, {
 			this.set({
 				stones: this.party.stones,
 			});	
+			if ( typeof onplay == "function" ) {
+				onplay();
+			}
 		} else {
 			alert( this.party.error );
 		}
