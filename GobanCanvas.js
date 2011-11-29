@@ -69,7 +69,7 @@ var GobanCanvas = $.inherit( Canvas, {
                 if ( typeof onplay == "function" ) {
                         onplay();
                 }
-	}
+	},
 
 
 
