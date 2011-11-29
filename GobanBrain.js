@@ -42,7 +42,7 @@ var GoParty = $.inherit({
 	},
 	is_current: function() {
 		return ( this.turn_index == this.gobans.length - 1 );
-	}
+	},
 	previous: function( ) {
 		if ( this.turn_index <= 0 ) {
 			return false;
