@@ -17,7 +17,7 @@ var GoParty = $.inherit({
         ***/
 	play: function( coord ) {
 		// Clone of stones array
-		var goban = new Goban( this.size, $.extend( true, [], this.goban().stones, this.goban().prisoner ) );
+		var goban = new Goban( this.size, $.extend( true, [], this.goban().stones ), this.goban().prisoner.slice( 0 ) );
 		var turn = coord;
 		if ( typeof turn.color == "undefined" ) {
 			turn.color = this.current_color();
@@ -87,9 +87,6 @@ var Goban = $.inherit({
            CONSTRUCTOR
         ***/
         __constructor: function( size, stones, prisoner ) {
-		if ( typeof stones == "undefined" ) {
-			stones = [ ];
-		}
 		if ( typeof prisoner == "undefined" ) {
                         prisoner = [ 0, 0 ];
                 }
