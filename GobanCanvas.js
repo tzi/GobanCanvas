@@ -13,7 +13,7 @@ var GobanCanvas = $.inherit( Canvas, {
 			stones: [],
 			cell_size: 24
 		}
-		this.dependencies = [ 'goban_size', 'initial_stones' ];
+		this.dependencies = [ 'goban_size' ];
 		var layer = this.add_layer( 'bg', new Goban_Background( this ) );
 			    this.add_layer( 'grid', new Goban_Grid( this ) );
 		            this.add_layer( 'stones', new Goban_Stones( this ) );
@@ -25,35 +25,52 @@ var GobanCanvas = $.inherit( Canvas, {
 	   PUBLIC METHODS
         ***/
 	play: function ( x, y ) {
-		var turn = { x:x, y:y }
-		this.party.play( turn );
-		if ( this.party.error == false ) {
-			this.set({
-				stones: this.party.stones,
-			});	
-			if ( typeof onplay == "function" ) {
-				onplay();
+		if ( this.party.is_current() || confirm( "Do you want to change your game ?" ) ) {
+			var turn = { x:x, y:y }
+			this.party.play( turn );
+			if ( this.party.error == false ) {
+		                this.played();
+			} else {
+				alert( this.party.error );
 			}
-		} else {
-			alert( this.party.error );
 		}
 	},
         begin: function( ) {
 		this.party.begin( );
-                this.set( { stones: this.party.stones } );
+                this.played();
         },
         previous: function( ) {
 		this.party.previous( );
-                this.set( { stones: this.party.stones } );
+                this.played();
         },
         next: function( ) {
                 this.party.next( );
-                this.set( { stones: this.party.stones } );
+                this.played();
         },
         end: function( ) {
 		this.party.end( );
-		this.set( { stones: this.party.stones } );
+		this.played();
         },
+	black_prisoner: function() {
+		return this.party.goban().prisoner[ 0 ];
+	},
+	white_prisoner: function() {
+                return this.party.goban().prisoner[ 1 ];
+        },
+
+
+        /***
+           PRIVATE METHODS
+        ***/
+	played: function() {
+		this.set({
+                        stones: this.party.goban().stones,
+                });
+                if ( typeof onplay == "function" ) {
+                        onplay();
+                }
+	}
+
 
 
 	/***
@@ -64,21 +81,8 @@ var GobanCanvas = $.inherit( Canvas, {
 			var goban_size = this.get('goban_size');
 			this.party = new GoParty( goban_size, this.get( 'stones' ) );
 	                this.scale( 20 / (goban_size + 1) );
-		} else if ( attribute == 'initial_stones' ) {
-			var initial_stones = this.get( 'initial_stones' );
-			new GoParty( this.get('goban_size'), this.get( 'initial_stones' ) );
-			var stones = [];
-			for ( var i in this.colors ) {
-				for ( var stone in initial_stones[ i ] ) {
-					stones = this.add_stone( stones, stone.x, stone.y, i );
-				}
-			}
-			this.set({
-				stones: stones,
-			});
 		}
 	},
-
 	onclick: function( x, y ) {
                 // STONE COORDS
                 var cell_size  = this.get('cell_size');

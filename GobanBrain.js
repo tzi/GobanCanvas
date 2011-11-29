@@ -7,10 +7,8 @@ var GoParty = $.inherit({
 	__constructor: function( size, stones ) {
 		this.size = size;
 		this.error = false;
-		this.stones = stones;
 		this.gobans = [ new Goban( size, stones ) ];
 		this.turn_index = 0;
-		this.prisoner = [ 0, 0 ];
 	},
 
 
@@ -19,7 +17,7 @@ var GoParty = $.inherit({
         ***/
 	play: function( coord ) {
 		// Clone of stones array
-		var goban = new Goban( this.size, $.extend( true, [], this.stones ) );
+		var goban = new Goban( this.size, $.extend( true, [], this.goban().stones ) );
 		var turn = coord;
 		if ( typeof turn.color == "undefined" ) {
 			turn.color = this.current_color();
@@ -32,7 +30,6 @@ var GoParty = $.inherit({
 			this.error = goban.error;
 		}
 		if ( this.error == false ) {
-			this.stones = goban.stones;
 			this.turn_index++;
 			this.gobans = this.gobans.slice( 0, this.turn_index );
 			this.gobans[ this.turn_index ] = goban;
@@ -40,6 +37,12 @@ var GoParty = $.inherit({
 		} 
 		return false;
 	},
+	goban: function() {
+		return this.gobans[ this.turn_index ];
+	},
+	is_current: function() {
+		return ( this.turn_index == this.gobans.length - 1 );
+	}
 	previous: function( ) {
 		if ( this.turn_index <= 0 ) {
 			return false;
@@ -73,7 +76,6 @@ var GoParty = $.inherit({
 	},
 	update_turn_index: function( turn_index ) {
 		this.turn_index = turn_index;
-		this.stones = this.gobans[ this.turn_index ].stones;
 	},
 });
 
@@ -90,6 +92,7 @@ var Goban = $.inherit({
 		this.size = size;
 		this.error = false;
 		this.KOable = false;
+                this.prisoner = [ 0, 0 ];
         },
 
 
